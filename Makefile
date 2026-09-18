@@ -1,4 +1,4 @@
-.PHONY: help dev dev-backend dev-frontend build test clean
+.PHONY: help dev dev-backend dev-frontend build test clean docker-up docker-down docker-logs
 
 help: ## Display documented targets
 	@echo "Available targets:"
@@ -24,3 +24,12 @@ test: ## Run backend tests and frontend checks
 clean: ## Clean build artifacts
 	cargo clean
 	rm -rf frontend/dist
+
+docker-up: ## Build and start Docker containers in detached mode
+	docker compose up -d --build
+
+docker-down: ## Stop and remove Docker containers
+	docker compose down
+
+docker-logs: ## View live Docker container logs
+	docker compose logs -f
