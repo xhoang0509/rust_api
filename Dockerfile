@@ -19,7 +19,8 @@ RUN mkdir -p src && \
     cargo build --release && \
     rm -rf src
 
-# Copy real source code
+# Copy real source code and migrations for compile-time macro
+COPY migrations ./migrations
 COPY src ./src
 
 # Update timestamps to ensure cargo detects changes and build the final release binary
