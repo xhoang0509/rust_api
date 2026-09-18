@@ -3,7 +3,9 @@ pub mod db;
 pub mod models;
 pub mod routes;
 
-pub use models::{Author, CreateAuthor, UpdateAuthor};
+pub use models::{
+    Author, CreateAuthor, CreatePost, Post, PostWithAuthor, UpdateAuthor, UpdatePost,
+};
 
 use axum::Router;
 use sqlx::SqlitePool;
