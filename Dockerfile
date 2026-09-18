@@ -1,5 +1,5 @@
 # --- Stage 1: Build binary ---
-FROM rust:1.85-slim-bookworm AS builder
+FROM rust:bookworm AS builder
 
 WORKDIR /app
 
