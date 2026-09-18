@@ -35,3 +35,20 @@ pub struct UpdatePost {
     pub title: String,
     pub content: String,
 }
+
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct PostQuery {
+    pub page: Option<u32>,
+    pub limit: Option<u32>,
+    pub search: Option<String>,
+    pub author_id: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct PaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub total: i64,
+    pub page: u32,
+    pub limit: u32,
+    pub total_pages: u32,
+}

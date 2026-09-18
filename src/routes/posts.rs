@@ -1,15 +1,23 @@
-use crate::models::post::{CreatePost, Post, PostWithAuthor, UpdatePost};
+use crate::models::post::{
+    CreatePost, PaginatedResponse, Post, PostQuery, PostWithAuthor, UpdatePost,
+};
 use crate::AppState;
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     Json,
 };
 
 pub async fn list_posts(
     State(state): State<AppState>,
-) -> Result<Json<Vec<PostWithAuthor>>, StatusCode> {
-    let posts = sqlx::query_as::<_, PostWithAuthor>(
+    Query(query): Query<PostQuery>,
+) -> Result<Json<PaginatedResponse<PostWithAuthor>>, StatusCode> {
+    let page = query.page.unwrap_or(1).max(1);
+    let limit = query.limit.unwrap_or(10).clamp(1, 100);
+    let offset = (page - 1) * limit;
+
+    let mut count_builder = sqlx::QueryBuilder::new("SELECT COUNT(*) FROM posts p");
+    let mut data_builder = sqlx::QueryBuilder::new(
         r#"
         SELECT
             p.id,
@@ -22,17 +30,78 @@ pub async fn list_posts(
             a.email AS author_email
         FROM posts p
         JOIN authors a ON p.author_id = a.id
-        ORDER BY p.id ASC
         "#,
-    )
-    .fetch_all(&state.pool)
-    .await
-    .map_err(|e| {
-        tracing::error!("Failed to fetch posts: {:?}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    );
 
-    Ok(Json(posts))
+    // Apply filters
+    let mut has_where = false;
+
+    if let Some(author_id) = query.author_id {
+        count_builder.push(" WHERE p.author_id = ");
+        count_builder.push_bind(author_id);
+
+        data_builder.push(" WHERE p.author_id = ");
+        data_builder.push_bind(author_id);
+
+        has_where = true;
+    }
+
+    if let Some(ref search) = query.search {
+        let pattern = format!("%{}%", search);
+        let prefix = if has_where { " AND " } else { " WHERE " };
+
+        count_builder.push(prefix);
+        count_builder.push("(p.title LIKE ");
+        count_builder.push_bind(pattern.clone());
+        count_builder.push(" OR p.content LIKE ");
+        count_builder.push_bind(pattern.clone());
+        count_builder.push(")");
+
+        data_builder.push(prefix);
+        data_builder.push("(p.title LIKE ");
+        data_builder.push_bind(pattern.clone());
+        data_builder.push(" OR p.content LIKE ");
+        data_builder.push_bind(pattern);
+        data_builder.push(")");
+    }
+
+    let total: (i64,) = count_builder
+        .build_query_as()
+        .fetch_one(&state.pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to count posts: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let total_count = total.0;
+    let total_pages = if total_count == 0 {
+        0
+    } else {
+        (total_count as f64 / limit as f64).ceil() as u32
+    };
+
+    data_builder.push(" ORDER BY p.id ASC LIMIT ");
+    data_builder.push_bind(limit);
+    data_builder.push(" OFFSET ");
+    data_builder.push_bind(offset);
+
+    let posts = data_builder
+        .build_query_as::<PostWithAuthor>()
+        .fetch_all(&state.pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to fetch posts: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    Ok(Json(PaginatedResponse {
+        items: posts,
+        total: total_count,
+        page,
+        limit,
+        total_pages,
+    }))
 }
 
 pub async fn create_post(

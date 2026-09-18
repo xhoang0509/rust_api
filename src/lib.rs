@@ -4,7 +4,8 @@ pub mod models;
 pub mod routes;
 
 pub use models::{
-    Author, CreateAuthor, CreatePost, Post, PostWithAuthor, UpdateAuthor, UpdatePost,
+    Author, CreateAuthor, CreatePost, PaginatedResponse, Post, PostQuery, PostWithAuthor,
+    UpdateAuthor, UpdatePost,
 };
 
 use axum::Router;
