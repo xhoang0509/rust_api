@@ -32,6 +32,18 @@ PORT=3000 HOST=127.0.0.1 cargo run
 cargo test
 ```
 
+### Running with Docker
+
+Build the Docker image:
+```bash
+docker build -t rust_api .
+```
+
+Run the container:
+```bash
+docker run -p 8080:8080 rust_api
+```
+
 ### Health Check Endpoint
 
 ```bash
