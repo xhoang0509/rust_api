@@ -4,6 +4,7 @@ pub mod db;
 pub mod extractors;
 pub mod models;
 pub mod routes;
+pub mod static_assets;
 
 pub use auth::{generate_token, hash_password, verify_password, verify_token, Claims};
 pub use extractors::AuthUser;
@@ -32,6 +33,7 @@ pub fn create_app_with_secret(pool: SqlitePool, jwt_secret: String) -> Router {
 
     Router::new()
         .merge(routes::routes())
+        .fallback(static_assets::static_handler)
         .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http())
         .with_state(state)
