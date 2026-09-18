@@ -1,0 +1,39 @@
+# CodeRabbit configuration file (.coderabbit.yaml)
+# Reference: https://docs.coderabbit.ai/reference/configuration
+
+language: "en-US"
+early_access: false
+
+reviews:
+  # Review profile: quiet, chill, or assertive
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  sequence_diagrams: true
+  changed_files_summary: true
+
+  # Auto review configuration
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 5
+    base_branches:
+      - "main"
+    ignore_usernames:
+      - "dependabot[bot]"
+      - "github-actions[bot]"
+
+  # Project-specific instructions for the AI reviewer
+  instructions: |
+    This repository is a full-stack project:
+    - Backend: Rust, Axum 0.8, Tokio, SQLx with SQLite persistence. Follow Rust idiomatic practices, error handling with proper HTTP status codes, async hygiene, and clean module boundaries.
+    - Frontend: React 19, TypeScript, Tailwind CSS v4, Vite. Enforce strict TypeScript types, component reusability, and clean state management.
+    - Testing: Backend uses Rust integration tests with in-memory SQLite; verify cascade deletion behavior and endpoint contracts.
+    - Orchestration: Makefile commands (`make dev`, `make build`, `make test`).
+
+chat:
+  auto_reply: true
