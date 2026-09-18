@@ -20,3 +20,22 @@ pub struct UpdateAuthor {
     pub name: String,
     pub email: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct RegisterRequest {
+    pub name: String,
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct LoginRequest {
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct AuthResponse {
+    pub token: String,
+    pub author: Author,
+}

@@ -1,0 +1,1 @@
+ALTER TABLE authors ADD COLUMN password_hash TEXT NOT NULL DEFAULT '';

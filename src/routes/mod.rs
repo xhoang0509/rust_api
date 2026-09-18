@@ -1,13 +1,17 @@
+pub mod auth;
 pub mod authors;
 pub mod health;
 pub mod posts;
 
 use crate::AppState;
-use axum::{routing::get, Router};
+use axum::{routing::get, routing::post, Router};
 
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/health", get(health::health_check))
+        .route("/api/auth/register", post(auth::register))
+        .route("/api/auth/login", post(auth::login))
+        .route("/api/auth/me", get(auth::me))
         .route(
             "/api/authors",
             get(authors::list_authors).post(authors::create_author),
