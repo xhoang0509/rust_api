@@ -5,6 +5,8 @@ import { PostForm } from './components/PostForm';
 import { PostList } from './components/PostList';
 import { SearchBar } from './components/SearchBar';
 import { Pagination } from './components/Pagination';
+import { AuthModal } from './components/AuthModal';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import {
   getAuthors,
   createAuthor,
@@ -26,9 +28,14 @@ import type {
   UpdatePost,
 } from './types';
 
-export function App() {
-  const [activeTab, setActiveTab] = useState<'authors' | 'posts'>('authors');
+function AppContent() {
+  const { isAuthenticated, currentUser, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState<'authors' | 'posts'>('posts');
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+
+  // Auth modal state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
 
   // Authors state
   const [authors, setAuthors] = useState<Author[]>([]);
@@ -121,6 +128,13 @@ export function App() {
   useEffect(() => {
     loadPosts();
   }, [loadPosts]);
+
+  // Clear editing state if user logs out
+  useEffect(() => {
+    if (!isAuthenticated && editingPost) {
+      setEditingPost(null);
+    }
+  }, [isAuthenticated, editingPost]);
 
   // Author Handlers
   const handleAuthorSubmit = async (data: CreateAuthor | UpdateAuthor) => {
@@ -229,7 +243,6 @@ export function App() {
     setPage(1);
   };
 
-
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col font-sans">
       {/* Top Navigation Header */}
@@ -270,6 +283,49 @@ export function App() {
                 </strong>
               </span>
             </div>
+
+            {/* Auth Controls / User Profile Badge */}
+            {isAuthenticated && currentUser ? (
+              <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
+                <div className="text-right hidden sm:block">
+                  <p className="text-xs font-semibold text-gray-800 leading-none">{currentUser.name}</p>
+                  <p className="text-[11px] text-gray-500 leading-tight mt-0.5">{currentUser.email}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs">
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </div>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="text-xs font-medium text-gray-600 hover:text-red-600 px-2.5 py-1.5 rounded-lg border border-gray-200 hover:border-red-200 hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthModalMode('login');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="text-xs font-medium text-gray-700 hover:text-blue-600 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors cursor-pointer"
+                >
+                  Log In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthModalMode('register');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg shadow-xs transition-colors cursor-pointer"
+                >
+                  Register
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -301,26 +357,6 @@ export function App() {
         {/* Navigation Tabs */}
         <div className="flex border-b border-gray-200 mb-8">
           <button
-            onClick={() => setActiveTab('authors')}
-            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2 ${
-              activeTab === 'authors'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <span>Authors</span>
-            <span
-              className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === 'authors'
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              {authors.length}
-            </span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('posts')}
             className={`py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2 ${
               activeTab === 'posts'
@@ -337,6 +373,26 @@ export function App() {
               }`}
             >
               {totalPosts}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('authors')}
+            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2 ${
+              activeTab === 'authors'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <span>Authors</span>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full ${
+                activeTab === 'authors'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              {authors.length}
             </span>
           </button>
         </div>
@@ -375,6 +431,10 @@ export function App() {
                 onCancel={() => setEditingPost(null)}
                 isLoading={postFormLoading}
                 error={postError}
+                onOpenAuth={() => {
+                  setAuthModalMode('login');
+                  setIsAuthModalOpen(true);
+                }}
               />
             </div>
             <div className="lg:col-span-2">
@@ -412,11 +472,25 @@ export function App() {
         )}
       </main>
 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalMode}
+      />
+
       <footer className="border-t border-gray-200 bg-white py-4 mt-auto">
         <div className="max-w-6xl mx-auto px-4 text-center text-xs text-gray-500">
           Rust Axum SQLite Backend & React TypeScript Tailwind Frontend
         </div>
       </footer>
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

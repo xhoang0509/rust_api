@@ -36,7 +36,7 @@ export interface PostWithAuthor {
 }
 
 export interface CreatePost {
-  author_id: number;
+  author_id?: number;
   title: string;
   content: string;
 }
@@ -44,6 +44,22 @@ export interface CreatePost {
 export interface UpdatePost {
   title: string;
   content: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  author: Author;
 }
 
 export interface PaginatedResponse<T> {

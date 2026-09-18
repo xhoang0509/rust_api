@@ -16,6 +16,11 @@ export async function request<T>(
 ): Promise<T> {
   const headers = new Headers(options.headers || {});
 
+  const token = localStorage.getItem('auth_token');
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
   if (options.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
