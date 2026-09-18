@@ -3,12 +3,13 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use rust_api::{create_app, routes::health::HealthResponse};
+use rust_api::{create_app, db::init_pool, routes::health::HealthResponse};
 use tower::ServiceExt;
 
 #[tokio::test]
 async fn test_health_check_returns_200_and_status_ok() {
-    let app = create_app();
+    let pool = init_pool("sqlite::memory:").await.unwrap();
+    let app = create_app(pool);
 
     let response = app
         .oneshot(

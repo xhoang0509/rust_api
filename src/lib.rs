@@ -1,12 +1,26 @@
 pub mod config;
 pub mod db;
+pub mod models;
 pub mod routes;
 
+pub use models::{Author, CreateAuthor, UpdateAuthor};
+
 use axum::Router;
+use sqlx::SqlitePool;
+use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 
-pub fn create_app() -> Router {
+#[derive(Clone)]
+pub struct AppState {
+    pub pool: SqlitePool,
+}
+
+pub fn create_app(pool: SqlitePool) -> Router {
+    let state = AppState { pool };
+
     Router::new()
         .merge(routes::routes())
+        .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http())
+        .with_state(state)
 }
