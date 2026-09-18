@@ -3,6 +3,7 @@ import type { PostWithAuthor } from '../types';
 
 interface PostListProps {
   posts: PostWithAuthor[];
+  totalPosts?: number;
   onEdit: (post: PostWithAuthor) => void;
   onDelete: (id: number) => Promise<void>;
   isLoading?: boolean;
@@ -10,6 +11,7 @@ interface PostListProps {
 
 export const PostList: FC<PostListProps> = ({
   posts,
+  totalPosts,
   onEdit,
   onDelete,
   isLoading = false,
@@ -30,7 +32,7 @@ export const PostList: FC<PostListProps> = ({
           📝
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-1">No posts found</h3>
-        <p className="text-gray-500 text-sm">Get started by creating your first post above.</p>
+        <p className="text-gray-500 text-sm">No posts match your search or filters.</p>
       </div>
     );
   }
@@ -55,11 +57,13 @@ export const PostList: FC<PostListProps> = ({
     }
   };
 
+  const displayCount = totalPosts !== undefined ? totalPosts : posts.length;
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center px-1">
         <h2 className="text-lg font-bold text-gray-800">
-          All Posts <span className="text-sm font-normal text-gray-500">({posts.length})</span>
+          Posts <span className="text-sm font-normal text-gray-500">({displayCount})</span>
         </h2>
       </div>
 

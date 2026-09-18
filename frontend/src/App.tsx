@@ -3,6 +3,8 @@ import { AuthorForm } from './components/AuthorForm';
 import { AuthorList } from './components/AuthorList';
 import { PostForm } from './components/PostForm';
 import { PostList } from './components/PostList';
+import { SearchBar } from './components/SearchBar';
+import { Pagination } from './components/Pagination';
 import {
   getAuthors,
   createAuthor,
@@ -35,12 +37,19 @@ export function App() {
   const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
   const [authorError, setAuthorError] = useState<string | null>(null);
 
-  // Posts state
+  // Posts state & pagination/filtering
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const [postFormLoading, setPostFormLoading] = useState(false);
   const [editingPost, setEditingPost] = useState<PostWithAuthor | null>(null);
   const [postError, setPostError] = useState<string | null>(null);
+
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalPosts, setTotalPosts] = useState<number>(0);
+  const [search, setSearch] = useState<string>('');
+  const [authorFilterId, setAuthorFilterId] = useState<number | undefined>(undefined);
 
   // Alert/Notification banner state
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -83,25 +92,35 @@ export function App() {
     }
   }, []);
 
-  // Fetch posts
+  // Fetch posts with filters and pagination
   const loadPosts = useCallback(async () => {
     setPostsLoading(true);
     try {
-      const data = await getPosts();
-      setPosts(data);
+      const res = await getPosts({
+        page,
+        limit,
+        search: search.trim() ? search.trim() : undefined,
+        author_id: authorFilterId,
+      });
+      setPosts(res.items);
+      setTotalPages(res.total_pages);
+      setTotalPosts(res.total);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to fetch posts';
       setPostError(msg);
     } finally {
       setPostsLoading(false);
     }
-  }, []);
+  }, [page, limit, search, authorFilterId]);
 
   useEffect(() => {
     checkHealth();
     loadAuthors();
+  }, [checkHealth, loadAuthors]);
+
+  useEffect(() => {
     loadPosts();
-  }, [checkHealth, loadAuthors, loadPosts]);
+  }, [loadPosts]);
 
   // Author Handlers
   const handleAuthorSubmit = async (data: CreateAuthor | UpdateAuthor) => {
@@ -139,6 +158,10 @@ export function App() {
         setEditingAuthor(null);
       }
       showAlert('success', 'Author and associated posts deleted successfully.');
+      // If deleted author was in filter, reset filter
+      if (authorFilterId === id) {
+        setAuthorFilterId(undefined);
+      }
       // Refresh posts because cascade deletion deletes author's posts
       loadPosts();
     } catch (err: unknown) {
@@ -154,16 +177,14 @@ export function App() {
     try {
       if (editingPost) {
         const updated = await updatePost(editingPost.id, data as UpdatePost);
-        setPosts((prev) =>
-          prev.map((p) => (p.id === updated.id ? updated : p))
-        );
         setEditingPost(null);
         showAlert('success', `Post "${updated.title}" updated successfully.`);
       } else {
         const created = await createPost(data as CreatePost);
-        setPosts((prev) => [created, ...prev]);
         showAlert('success', `Post "${created.title}" created successfully.`);
       }
+      // Reload posts from server to respect current page / search filters
+      loadPosts();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Operation failed';
       setPostError(msg);
@@ -176,16 +197,38 @@ export function App() {
   const handlePostDelete = async (id: number) => {
     try {
       await deletePost(id);
-      setPosts((prev) => prev.filter((p) => p.id !== id));
       if (editingPost?.id === id) {
         setEditingPost(null);
       }
       showAlert('success', 'Post deleted successfully.');
+      // If deleting the last item on a page > 1, step back a page
+      if (posts.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        loadPosts();
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to delete post';
       showAlert('error', msg);
     }
   };
+
+  const handleSearchChange = (newSearch: string) => {
+    setSearch(newSearch);
+    setPage(1); // Reset to page 1 on search change
+  };
+
+  const handleAuthorFilterChange = (newAuthorId?: number) => {
+    setAuthorFilterId(newAuthorId);
+    setPage(1); // Reset to page 1 on filter change
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setAuthorFilterId(undefined);
+    setPage(1);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col font-sans">
@@ -293,7 +336,7 @@ export function App() {
                   : 'bg-gray-100 text-gray-600'
               }`}
             >
-              {posts.length}
+              {totalPosts}
             </span>
           </button>
         </div>
@@ -335,13 +378,33 @@ export function App() {
               />
             </div>
             <div className="lg:col-span-2">
+              <SearchBar
+                authors={authors}
+                search={search}
+                authorId={authorFilterId}
+                onSearchChange={handleSearchChange}
+                onAuthorChange={handleAuthorFilterChange}
+                onClear={handleClearFilters}
+              />
               <PostList
                 posts={posts}
+                totalPosts={totalPosts}
                 onEdit={(post) => {
                   setEditingPost(post);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 onDelete={handlePostDelete}
+                isLoading={postsLoading}
+              />
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                total={totalPosts}
+                limit={limit}
+                onPageChange={(newPage) => {
+                  setPage(newPage);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 isLoading={postsLoading}
               />
             </div>

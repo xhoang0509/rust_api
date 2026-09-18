@@ -45,3 +45,18 @@ export interface UpdatePost {
   title: string;
   content: string;
 }
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+export interface PostQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  author_id?: number;
+}
