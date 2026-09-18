@@ -1,10 +1,12 @@
 pub mod auth;
 pub mod config;
 pub mod db;
+pub mod extractors;
 pub mod models;
 pub mod routes;
 
 pub use auth::{generate_token, hash_password, verify_password, verify_token, Claims};
+pub use extractors::AuthUser;
 pub use models::{
     AuthResponse, Author, CreateAuthor, CreatePost, LoginRequest, PaginatedResponse, Post,
     PostQuery, PostWithAuthor, RegisterRequest, UpdateAuthor, UpdatePost,

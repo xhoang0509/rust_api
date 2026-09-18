@@ -1,3 +1,4 @@
+use crate::extractors::AuthUser;
 use crate::models::post::{
     CreatePost, PaginatedResponse, Post, PostQuery, PostWithAuthor, UpdatePost,
 };
@@ -106,27 +107,11 @@ pub async fn list_posts(
 
 pub async fn create_post(
     State(state): State<AppState>,
+    auth_user: AuthUser,
     Json(payload): Json<CreatePost>,
 ) -> Result<(StatusCode, Json<Post>), (StatusCode, String)> {
-    // Check if author exists to provide a friendly 400 Bad Request if missing
-    let author_exists: Option<(i64,)> = sqlx::query_as("SELECT id FROM authors WHERE id = ?")
-        .bind(payload.author_id)
-        .fetch_optional(&state.pool)
-        .await
-        .map_err(|e| {
-            tracing::error!("Failed to check author existence: {:?}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Database error".to_string(),
-            )
-        })?;
-
-    if author_exists.is_none() {
-        return Err((StatusCode::BAD_REQUEST, "Author not found".to_string()));
-    }
-
     let result = sqlx::query("INSERT INTO posts (author_id, title, content) VALUES (?, ?, ?)")
-        .bind(payload.author_id)
+        .bind(auth_user.id)
         .bind(&payload.title)
         .bind(&payload.content)
         .execute(&state.pool)
@@ -195,10 +180,11 @@ pub async fn get_post(
 pub async fn update_post(
     State(state): State<AppState>,
     Path(id): Path<i64>,
+    auth_user: AuthUser,
     Json(payload): Json<UpdatePost>,
 ) -> Result<Json<Post>, (StatusCode, String)> {
-    // Check if post exists first
-    let exists: Option<(i64,)> = sqlx::query_as("SELECT id FROM posts WHERE id = ?")
+    // Check if post exists first and verify author ownership
+    let post_author: Option<(i64,)> = sqlx::query_as("SELECT author_id FROM posts WHERE id = ?")
         .bind(id)
         .fetch_optional(&state.pool)
         .await
@@ -210,8 +196,16 @@ pub async fn update_post(
             )
         })?;
 
-    if exists.is_none() {
-        return Err((StatusCode::NOT_FOUND, "Post not found".to_string()));
+    let post_author_id = match post_author {
+        Some((author_id,)) => author_id,
+        None => return Err((StatusCode::NOT_FOUND, "Post not found".to_string())),
+    };
+
+    if post_author_id != auth_user.id {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "You are not authorized to update this post".to_string(),
+        ));
     }
 
     let result = sqlx::query(
@@ -251,18 +245,46 @@ pub async fn update_post(
 pub async fn delete_post(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-) -> Result<StatusCode, StatusCode> {
+    auth_user: AuthUser,
+) -> Result<StatusCode, (StatusCode, String)> {
+    let post_author: Option<(i64,)> = sqlx::query_as("SELECT author_id FROM posts WHERE id = ?")
+        .bind(id)
+        .fetch_optional(&state.pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to check post existence: {:?}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            )
+        })?;
+
+    let post_author_id = match post_author {
+        Some((author_id,)) => author_id,
+        None => return Err((StatusCode::NOT_FOUND, "Post not found".to_string())),
+    };
+
+    if post_author_id != auth_user.id {
+        return Err((
+            StatusCode::FORBIDDEN,
+            "You are not authorized to delete this post".to_string(),
+        ));
+    }
+
     let result = sqlx::query("DELETE FROM posts WHERE id = ?")
         .bind(id)
         .execute(&state.pool)
         .await
         .map_err(|e| {
             tracing::error!("Failed to delete post: {:?}", e);
-            StatusCode::INTERNAL_SERVER_ERROR
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            )
         })?;
 
     if result.rows_affected() == 0 {
-        Err(StatusCode::NOT_FOUND)
+        Err((StatusCode::NOT_FOUND, "Post not found".to_string()))
     } else {
         Ok(StatusCode::NO_CONTENT)
     }

@@ -1,11 +1,8 @@
-use crate::auth::{generate_token, hash_password, verify_password, verify_token};
+use crate::auth::{generate_token, hash_password, verify_password};
+use crate::extractors::AuthUser;
 use crate::models::author::{AuthResponse, Author, LoginRequest, RegisterRequest};
 use crate::AppState;
-use axum::{
-    extract::State,
-    http::{header, HeaderMap, StatusCode},
-    Json,
-};
+use axum::{extract::State, http::StatusCode, Json};
 
 pub async fn register(
     State(state): State<AppState>,
@@ -120,29 +117,12 @@ pub async fn login(
 
 pub async fn me(
     State(state): State<AppState>,
-    headers: HeaderMap,
+    auth_user: AuthUser,
 ) -> Result<Json<Author>, (StatusCode, String)> {
-    let auth_header = headers
-        .get(header::AUTHORIZATION)
-        .and_then(|val| val.to_str().ok());
-
-    let token = match auth_header {
-        Some(header_val) if header_val.starts_with("Bearer ") => &header_val[7..],
-        _ => return Err((StatusCode::UNAUTHORIZED, "Unauthorized".to_string())),
-    };
-
-    let claims = verify_token(token, &state.jwt_secret)
-        .map_err(|_| (StatusCode::UNAUTHORIZED, "Unauthorized".to_string()))?;
-
-    let user_id: i64 = claims
-        .sub
-        .parse()
-        .map_err(|_| (StatusCode::UNAUTHORIZED, "Unauthorized".to_string()))?;
-
     let author = sqlx::query_as::<_, Author>(
         "SELECT id, name, email, created_at FROM authors WHERE id = ?",
     )
-    .bind(user_id)
+    .bind(auth_user.id)
     .fetch_optional(&state.pool)
     .await
     .map_err(|e| {
