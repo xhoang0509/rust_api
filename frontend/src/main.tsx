@@ -1,18 +1,10 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-
-export function App() {
-  return (
-    <div className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold text-gray-900">Rust SQLite + React CRUD</h1>
-      <p className="mt-2 text-gray-600">Frontend scaffold initialized.</p>
-    </div>
-  );
-}
+import { App } from './App';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  <StrictMode>
     <App />
-  </React.StrictMode>
+  </StrictMode>
 );
