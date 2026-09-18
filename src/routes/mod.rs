@@ -2,8 +2,8 @@ pub mod authors;
 pub mod health;
 pub mod posts;
 
-use axum::{routing::get, Router};
 use crate::AppState;
+use axum::{routing::get, Router};
 
 pub fn routes() -> Router<AppState> {
     Router::new()
@@ -18,7 +18,10 @@ pub fn routes() -> Router<AppState> {
                 .put(authors::update_author)
                 .delete(authors::delete_author),
         )
-        .route("/api/posts", get(posts::list_posts).post(posts::create_post))
+        .route(
+            "/api/posts",
+            get(posts::list_posts).post(posts::create_post),
+        )
         .route(
             "/api/posts/{id}",
             get(posts::get_post)
@@ -26,4 +29,3 @@ pub fn routes() -> Router<AppState> {
                 .delete(posts::delete_post),
         )
 }
-

@@ -1,10 +1,10 @@
+use crate::models::post::{CreatePost, Post, PostWithAuthor, UpdatePost};
+use crate::AppState;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
     Json,
 };
-use crate::models::post::{CreatePost, Post, PostWithAuthor, UpdatePost};
-use crate::AppState;
 
 pub async fn list_posts(
     State(state): State<AppState>,
@@ -46,21 +46,22 @@ pub async fn create_post(
         .await
         .map_err(|e| {
             tracing::error!("Failed to check author existence: {:?}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string())
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            )
         })?;
 
     if author_exists.is_none() {
         return Err((StatusCode::BAD_REQUEST, "Author not found".to_string()));
     }
 
-    let result = sqlx::query(
-        "INSERT INTO posts (author_id, title, content) VALUES (?, ?, ?)",
-    )
-    .bind(payload.author_id)
-    .bind(&payload.title)
-    .bind(&payload.content)
-    .execute(&state.pool)
-    .await;
+    let result = sqlx::query("INSERT INTO posts (author_id, title, content) VALUES (?, ?, ?)")
+        .bind(payload.author_id)
+        .bind(&payload.title)
+        .bind(&payload.content)
+        .execute(&state.pool)
+        .await;
 
     match result {
         Ok(res) => {
@@ -80,7 +81,10 @@ pub async fn create_post(
         }
         Err(e) => {
             tracing::error!("Failed to insert post: {:?}", e);
-            Err((StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string()))
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            ))
         }
     }
 }
@@ -131,7 +135,10 @@ pub async fn update_post(
         .await
         .map_err(|e| {
             tracing::error!("Failed to check post existence: {:?}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string())
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            )
         })?;
 
     if exists.is_none() {
@@ -164,7 +171,10 @@ pub async fn update_post(
         }
         Err(e) => {
             tracing::error!("Failed to update post: {:?}", e);
-            Err((StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string()))
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Database error".to_string(),
+            ))
         }
     }
 }

@@ -3,11 +3,7 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use rust_api::{
-    create_app,
-    db::init_pool,
-    models::author::Author,
-};
+use rust_api::{create_app, db::init_pool, models::author::Author};
 use serde_json::json;
 use tower::ServiceExt;
 
