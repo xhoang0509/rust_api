@@ -16,14 +16,12 @@ pub async fn register(
         )
     })?;
 
-    let result = sqlx::query(
-        "INSERT INTO authors (name, email, password_hash) VALUES (?, ?, ?)",
-    )
-    .bind(&payload.name)
-    .bind(&payload.email)
-    .bind(&password_hash)
-    .execute(&state.pool)
-    .await;
+    let result = sqlx::query("INSERT INTO authors (name, email, password_hash) VALUES (?, ?, ?)")
+        .bind(&payload.name)
+        .bind(&payload.email)
+        .bind(&password_hash)
+        .execute(&state.pool)
+        .await;
 
     match result {
         Ok(res) => {
@@ -42,13 +40,14 @@ pub async fn register(
                 )
             })?;
 
-            let token = generate_token(author.id, &author.email, &state.jwt_secret).map_err(|e| {
-                tracing::error!("Failed to generate token: {:?}", e);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Internal server error".to_string(),
-                )
-            })?;
+            let token =
+                generate_token(author.id, &author.email, &state.jwt_secret).map_err(|e| {
+                    tracing::error!("Failed to generate token: {:?}", e);
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "Internal server error".to_string(),
+                    )
+                })?;
 
             Ok((StatusCode::CREATED, Json(AuthResponse { token, author })))
         }
@@ -119,19 +118,18 @@ pub async fn me(
     State(state): State<AppState>,
     auth_user: AuthUser,
 ) -> Result<Json<Author>, (StatusCode, String)> {
-    let author = sqlx::query_as::<_, Author>(
-        "SELECT id, name, email, created_at FROM authors WHERE id = ?",
-    )
-    .bind(auth_user.id)
-    .fetch_optional(&state.pool)
-    .await
-    .map_err(|e| {
-        tracing::error!("Failed to fetch author: {:?}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Database error".to_string(),
-        )
-    })?;
+    let author =
+        sqlx::query_as::<_, Author>("SELECT id, name, email, created_at FROM authors WHERE id = ?")
+            .bind(auth_user.id)
+            .fetch_optional(&state.pool)
+            .await
+            .map_err(|e| {
+                tracing::error!("Failed to fetch author: {:?}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Database error".to_string(),
+                )
+            })?;
 
     match author {
         Some(author) => Ok(Json(author)),

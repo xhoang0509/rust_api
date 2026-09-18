@@ -51,7 +51,12 @@ async fn test_static_assets_and_spa_fallback() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    let content_type = response.headers().get("content-type").unwrap().to_str().unwrap();
+    let content_type = response
+        .headers()
+        .get("content-type")
+        .unwrap()
+        .to_str()
+        .unwrap();
     assert!(content_type.starts_with("text/html"));
     let body = response.into_body().collect().await.unwrap().to_bytes();
     let html = String::from_utf8_lossy(&body);
@@ -70,7 +75,12 @@ async fn test_static_assets_and_spa_fallback() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    let content_type = response.headers().get("content-type").unwrap().to_str().unwrap();
+    let content_type = response
+        .headers()
+        .get("content-type")
+        .unwrap()
+        .to_str()
+        .unwrap();
     assert!(content_type.starts_with("text/html"));
 
     // Health and API routes should still function normally

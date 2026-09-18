@@ -24,7 +24,10 @@ pub async fn static_handler(uri: Uri) -> impl IntoResponse {
         Some(content) => {
             let mime = mime_guess::from_path(mime_path).first_or_octet_stream();
             Response::builder()
-                .header(header::CONTENT_TYPE, HeaderValue::from_str(mime.as_ref()).unwrap())
+                .header(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_str(mime.as_ref()).unwrap(),
+                )
                 .body(Body::from(content.data))
                 .unwrap()
         }

@@ -3,9 +3,7 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use rust_api::{
-    create_app_with_secret, db::init_pool, models::author::Author, AuthResponse,
-};
+use rust_api::{create_app_with_secret, db::init_pool, models::author::Author, AuthResponse};
 use serde_json::json;
 use tower::ServiceExt;
 
@@ -119,7 +117,9 @@ async fn test_auth_lifecycle() {
                 .method("POST")
                 .uri("/api/auth/login")
                 .header("content-type", "application/json")
-                .body(Body::from(serde_json::to_vec(&non_existent_payload).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&non_existent_payload).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
