@@ -23,9 +23,13 @@ impl Config {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    static ENV_MUTEX: Mutex<()> = Mutex::new(());
 
     #[test]
     fn test_config_defaults() {
+        let _lock = ENV_MUTEX.lock().unwrap();
         // Ensure without env variables set, defaults are 0.0.0.0:8080
         std::env::remove_var("HOST");
         std::env::remove_var("PORT");
@@ -37,6 +41,7 @@ mod tests {
 
     #[test]
     fn test_config_from_env() {
+        let _lock = ENV_MUTEX.lock().unwrap();
         std::env::set_var("HOST", "127.0.0.1");
         std::env::set_var("PORT", "3000");
         let config = Config::from_env();
