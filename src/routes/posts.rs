@@ -1,7 +1,8 @@
-use crate::extractors::AuthUser;
+use crate::extractors::{AuthUser, OptionalAuthUser};
 use crate::models::post::{
-    CreatePost, PaginatedResponse, Post, PostQuery, PostWithAuthor, UpdatePost,
+    CreatePost, PaginatedResponse, Post, PostDetail, PostQuery, PostWithAuthor, UpdatePost,
 };
+use crate::routes::reactions::fetch_reaction_breakdown_and_total;
 use crate::AppState;
 use axum::{
     extract::{Path, Query, State},
@@ -11,11 +12,13 @@ use axum::{
 
 pub async fn list_posts(
     State(state): State<AppState>,
+    opt_user: OptionalAuthUser,
     Query(query): Query<PostQuery>,
 ) -> Result<Json<PaginatedResponse<PostWithAuthor>>, StatusCode> {
     let page = query.page.unwrap_or(1).max(1);
     let limit = query.limit.unwrap_or(10).clamp(1, 100);
     let offset = (page - 1) * limit;
+    let current_user_id = opt_user.0.map(|u| u.id);
 
     let mut count_builder = sqlx::QueryBuilder::new("SELECT COUNT(*) FROM posts p");
     let mut data_builder = sqlx::QueryBuilder::new(
@@ -28,7 +31,14 @@ pub async fn list_posts(
             p.created_at,
             p.updated_at,
             a.name AS author_name,
-            a.email AS author_email
+            a.email AS author_email,
+            (SELECT COUNT(*) FROM post_reactions pr WHERE pr.post_id = p.id) AS reactions_count,
+            (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id) AS comments_count,
+            (SELECT reaction_type FROM post_reactions pr WHERE pr.post_id = p.id AND pr.author_id = "#,
+    );
+    data_builder.push_bind(current_user_id);
+    data_builder.push(
+        r#") AS user_reaction
         FROM posts p
         JOIN authors a ON p.author_id = a.id
         "#,
@@ -101,6 +111,7 @@ pub async fn list_posts(
         total: total_count,
         page,
         limit,
+        per_page: Some(limit),
         total_pages,
     }))
 }
@@ -145,8 +156,10 @@ pub async fn create_post(
 
 pub async fn get_post(
     State(state): State<AppState>,
+    opt_user: OptionalAuthUser,
     Path(id): Path<i64>,
-) -> Result<Json<PostWithAuthor>, StatusCode> {
+) -> Result<Json<PostDetail>, StatusCode> {
+    let current_user_id = opt_user.0.map(|u| u.id);
     let post = sqlx::query_as::<_, PostWithAuthor>(
         r#"
         SELECT
@@ -157,12 +170,16 @@ pub async fn get_post(
             p.created_at,
             p.updated_at,
             a.name AS author_name,
-            a.email AS author_email
+            a.email AS author_email,
+            (SELECT COUNT(*) FROM post_reactions pr WHERE pr.post_id = p.id) AS reactions_count,
+            (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id) AS comments_count,
+            (SELECT reaction_type FROM post_reactions pr WHERE pr.post_id = p.id AND pr.author_id = ?) AS user_reaction
         FROM posts p
         JOIN authors a ON p.author_id = a.id
         WHERE p.id = ?
         "#,
     )
+    .bind(current_user_id)
     .bind(id)
     .fetch_optional(&state.pool)
     .await
@@ -171,10 +188,32 @@ pub async fn get_post(
         StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
-    match post {
-        Some(post) => Ok(Json(post)),
-        None => Err(StatusCode::NOT_FOUND),
-    }
+    let post = match post {
+        Some(p) => p,
+        None => return Err(StatusCode::NOT_FOUND),
+    };
+
+    let (breakdown, _) = fetch_reaction_breakdown_and_total(&state.pool, id)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to fetch reaction breakdown: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    Ok(Json(PostDetail {
+        id: post.id,
+        author_id: post.author_id,
+        title: post.title,
+        content: post.content,
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+        author_name: post.author_name,
+        author_email: post.author_email,
+        reactions_count: post.reactions_count,
+        comments_count: post.comments_count,
+        user_reaction: post.user_reaction,
+        reactions_breakdown: breakdown,
+    }))
 }
 
 pub async fn update_post(

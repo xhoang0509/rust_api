@@ -7,10 +7,12 @@ pub mod routes;
 pub mod static_assets;
 
 pub use auth::{generate_token, hash_password, verify_password, verify_token, Claims};
-pub use extractors::AuthUser;
+pub use extractors::{AuthUser, OptionalAuthUser};
 pub use models::{
-    AuthResponse, Author, CreateAuthor, CreatePost, LoginRequest, PaginatedResponse, Post,
-    PostQuery, PostWithAuthor, RegisterRequest, UpdateAuthor, UpdatePost,
+    AuthResponse, Author, Comment, CommentQuery, CreateAuthor, CreateComment, CreatePost,
+    LoginRequest, PaginatedResponse, Post, PostDetail, PostQuery, PostReactionsResponse,
+    PostWithAuthor, ReactionBreakdown, ReactionSummary, ReactionType, ReactorItem, RegisterRequest,
+    SetReactionRequest, UpdateAuthor, UpdateComment, UpdatePost,
 };
 
 use axum::Router;

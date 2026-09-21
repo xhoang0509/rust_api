@@ -1,10 +1,15 @@
 pub mod auth;
 pub mod authors;
+pub mod comments;
 pub mod health;
 pub mod posts;
+pub mod reactions;
 
 use crate::AppState;
-use axum::{routing::get, routing::post, Router};
+use axum::{
+    routing::{get, post, put},
+    Router,
+};
 
 pub fn routes() -> Router<AppState> {
     Router::new()
@@ -31,5 +36,19 @@ pub fn routes() -> Router<AppState> {
             get(posts::get_post)
                 .put(posts::update_post)
                 .delete(posts::delete_post),
+        )
+        .route(
+            "/api/posts/{id}/reactions",
+            get(reactions::get_post_reactions)
+                .put(reactions::set_post_reaction)
+                .delete(reactions::delete_post_reaction),
+        )
+        .route(
+            "/api/posts/{id}/comments",
+            get(comments::list_comments).post(comments::create_comment),
+        )
+        .route(
+            "/api/comments/{id}",
+            put(comments::update_comment).delete(comments::delete_comment),
         )
 }
