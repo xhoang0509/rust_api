@@ -10,10 +10,7 @@ export class ApiError extends Error {
   }
 }
 
-export async function request<T>(
-  url: string,
-  options: RequestInit = {}
-): Promise<T> {
+export async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {});
 
   const token = localStorage.getItem('auth_token');

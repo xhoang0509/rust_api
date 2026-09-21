@@ -22,8 +22,8 @@ export const ToastCard: React.FC<ToastCardProps> = ({ toast, onClose }) => {
         toast.type === 'error'
           ? 'bg-white border-red-200 text-red-900 shadow-red-500/10'
           : toast.type === 'success'
-          ? 'bg-white border-emerald-200 text-emerald-900 shadow-emerald-500/10'
-          : 'bg-white border-blue-200 text-blue-900 shadow-blue-500/10'
+            ? 'bg-white border-emerald-200 text-emerald-900 shadow-emerald-500/10'
+            : 'bg-white border-blue-200 text-blue-900 shadow-blue-500/10'
       }`}
     >
       {/* Icon */}
@@ -72,9 +72,7 @@ export const ToastCard: React.FC<ToastCardProps> = ({ toast, onClose }) => {
       )}
 
       {/* Message */}
-      <div className="flex-1 text-sm font-medium leading-snug break-words">
-        {toast.message}
-      </div>
+      <div className="flex-1 text-sm font-medium leading-snug break-words">{toast.message}</div>
 
       {/* Close button */}
       <button

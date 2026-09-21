@@ -91,7 +91,10 @@ export const Pagination: FC<PaginationProps> = ({
           {pages.map((p, idx) => {
             if (typeof p === 'string') {
               return (
-                <span key={`ellipsis-${idx}`} className="px-2 py-1 text-sm text-gray-400 select-none">
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 py-1 text-sm text-gray-400 select-none"
+                >
                   {p}
                 </span>
               );
@@ -105,9 +108,7 @@ export const Pagination: FC<PaginationProps> = ({
                 onClick={() => onPageChange(p)}
                 disabled={isLoading}
                 className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {p}

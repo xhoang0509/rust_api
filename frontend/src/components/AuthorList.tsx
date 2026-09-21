@@ -36,7 +36,11 @@ export const AuthorList: FC<AuthorListProps> = ({
   }
 
   const handleDelete = (author: Author) => {
-    if (window.confirm(`Are you sure you want to delete "${author.name}"? This will also delete all their posts.`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete "${author.name}"? This will also delete all their posts.`,
+      )
+    ) {
       onDelete(author.id);
     }
   };

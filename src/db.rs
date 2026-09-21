@@ -4,6 +4,14 @@ use sqlx::{Error, SqlitePool};
 pub async fn init_pool(database_url: &str) -> Result<SqlitePool, Error> {
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
+        .after_connect(|conn, _meta| {
+            Box::pin(async move {
+                sqlx::query("PRAGMA foreign_keys = ON;")
+                    .execute(conn)
+                    .await?;
+                Ok(())
+            })
+        })
         .connect(database_url)
         .await?;
 

@@ -1,9 +1,17 @@
 import { request } from './client';
-import type { PostWithAuthor, CreatePost, UpdatePost, PaginatedResponse, PostQueryParams } from '../types';
+import type {
+  PostWithAuthor,
+  CreatePost,
+  UpdatePost,
+  PaginatedResponse,
+  PostQueryParams,
+} from '../types';
 
 const BASE_PATH = '/api/posts';
 
-export async function getPosts(params?: PostQueryParams): Promise<PaginatedResponse<PostWithAuthor>> {
+export async function getPosts(
+  params?: PostQueryParams,
+): Promise<PaginatedResponse<PostWithAuthor>> {
   const searchParams = new URLSearchParams();
   if (params?.page !== undefined) {
     searchParams.set('page', params.page.toString());
