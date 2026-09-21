@@ -26,9 +26,10 @@ interface PostCardProps {
 }
 
 function parseUtcDate(dateString: string): Date {
-  const normalizedDateStr = dateString.includes('Z') || dateString.includes('T')
-    ? dateString
-    : dateString.replace(' ', 'T') + 'Z';
+  const normalizedDateStr =
+    dateString.includes('Z') || dateString.includes('T')
+      ? dateString
+      : dateString.replace(' ', 'T') + 'Z';
   return new Date(normalizedDateStr);
 }
 
@@ -61,14 +62,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete }) =>
   const { showToast } = useToast();
 
   const [userReaction, setUserReaction] = useState<ReactionType | null>(
-    (post.user_reaction as ReactionType) || null
+    (post.user_reaction as ReactionType) || null,
   );
-  const [reactionsCount, setReactionsCount] = useState<number>(
-    post.reactions_count ?? 0
-  );
-  const [commentsCount, setCommentsCount] = useState<number>(
-    post.comments_count ?? 0
-  );
+  const [reactionsCount, setReactionsCount] = useState<number>(post.reactions_count ?? 0);
+  const [commentsCount, setCommentsCount] = useState<number>(post.comments_count ?? 0);
   const [breakdown, setBreakdown] = useState<ReactionBreakdown | undefined>(undefined);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 

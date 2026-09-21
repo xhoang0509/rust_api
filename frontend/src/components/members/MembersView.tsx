@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  Avatar,
-  Button,
-  Input,
-  Popconfirm,
-  Tag,
-  Tooltip,
-  Empty,
-  Skeleton,
-} from 'antd';
+import { Card, Avatar, Button, Input, Popconfirm, Tag, Tooltip, Empty, Skeleton } from 'antd';
 import {
   SearchOutlined,
   PlusOutlined,
@@ -44,10 +34,7 @@ export const MembersView: React.FC<MembersViewProps> = ({
   const filteredAuthors = authors.filter((author) => {
     const term = searchTerm.toLowerCase().trim();
     if (!term) return true;
-    return (
-      author.name.toLowerCase().includes(term) ||
-      author.email.toLowerCase().includes(term)
-    );
+    return author.name.toLowerCase().includes(term) || author.email.toLowerCase().includes(term);
   });
 
   return (

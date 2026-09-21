@@ -1,4 +1,5 @@
 /target
+node_modules
 Cargo.lock
 **/*.rs.bk
 *.swp
@@ -6,4 +7,5 @@ Cargo.lock
 *.db-*
 .agents/
 skills-lock.json
+.DS_Store
 

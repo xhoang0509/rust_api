@@ -39,9 +39,7 @@ export const PostList: React.FC<PostListProps> = ({
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={
             <div className="space-y-1">
-              <p className="text-base font-semibold text-gray-800">
-                Không tìm thấy bài viết nào
-              </p>
+              <p className="text-base font-semibold text-gray-800">Không tìm thấy bài viết nào</p>
               <p className="text-xs text-gray-500">
                 Hãy thử tìm kiếm với từ khóa khác hoặc tạo bài viết mới đầu tiên!
               </p>
@@ -70,12 +68,7 @@ export const PostList: React.FC<PostListProps> = ({
   return (
     <div className="space-y-4">
       {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          onEdit={onEdit}
-          onDelete={handleDelete}
-        />
+        <PostCard key={post.id} post={post} onEdit={onEdit} onDelete={handleDelete} />
       ))}
     </div>
   );

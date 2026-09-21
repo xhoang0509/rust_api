@@ -76,7 +76,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className={`text-lg ${activeTab === 'feed' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <span
+                className={`text-lg ${activeTab === 'feed' ? 'text-blue-600' : 'text-gray-500'}`}
+              >
                 <HomeFilled />
               </span>
               <span>Bảng tin chung</span>
@@ -96,7 +98,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className={`text-lg ${activeTab === 'my-posts' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <span
+                className={`text-lg ${activeTab === 'my-posts' ? 'text-blue-600' : 'text-gray-500'}`}
+              >
                 <UserOutlined />
               </span>
               <span>Bài viết của tôi</span>
@@ -113,7 +117,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className={`text-lg ${activeTab === 'members' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <span
+                className={`text-lg ${activeTab === 'members' ? 'text-blue-600' : 'text-gray-500'}`}
+              >
                 <TeamOutlined />
               </span>
               <span>Thành viên cộng đồng</span>
@@ -157,7 +163,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           <span>Không gian mạng riêng tư</span>
         </div>
         <p className="text-blue-700/90 leading-relaxed text-[11px]">
-          Mọi thảo luận, bài viết, cảm xúc và bình luận chỉ hiển thị nội bộ cho các thành viên đã xác thực.
+          Mọi thảo luận, bài viết, cảm xúc và bình luận chỉ hiển thị nội bộ cho các thành viên đã
+          xác thực.
         </p>
       </div>
 

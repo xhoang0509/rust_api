@@ -73,7 +73,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
         onReact(type);
       }
     },
-    [userReaction, onReact, onRemoveReaction]
+    [userReaction, onReact, onRemoveReaction],
   );
 
   const activeConfig = userReaction ? REACTION_CONFIG[userReaction] : null;

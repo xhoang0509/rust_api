@@ -13,7 +13,7 @@ export interface CommentQueryParams {
 
 export async function getComments(
   postId: number,
-  params?: CommentQueryParams
+  params?: CommentQueryParams,
 ): Promise<PaginatedResponse<Comment>> {
   const searchParams = new URLSearchParams();
   if (params?.page !== undefined) {
@@ -33,7 +33,7 @@ export async function getComments(
 
 export async function createComment(
   postId: number,
-  data: CreateCommentRequest | string
+  data: CreateCommentRequest | string,
 ): Promise<Comment> {
   const payload = typeof data === 'string' ? { content: data } : data;
   return request<Comment>(`/api/posts/${postId}/comments`, {
@@ -44,7 +44,7 @@ export async function createComment(
 
 export async function updateComment(
   commentId: number,
-  data: UpdateCommentRequest | string
+  data: UpdateCommentRequest | string,
 ): Promise<Comment> {
   const payload = typeof data === 'string' ? { content: data } : data;
   return request<Comment>(`/api/comments/${commentId}`, {

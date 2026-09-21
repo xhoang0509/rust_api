@@ -38,7 +38,7 @@ export const PostModalForm: React.FC<PostModalFormProps> = ({
       } else {
         // Default to author matching current user or first author
         const matchedAuthor = authors.find(
-          (a) => a.email.toLowerCase() === currentUser?.email?.toLowerCase()
+          (a) => a.email.toLowerCase() === currentUser?.email?.toLowerCase(),
         );
         form.setFieldsValue({
           title: '',
@@ -79,10 +79,7 @@ export const PostModalForm: React.FC<PostModalFormProps> = ({
     >
       {/* Author info header */}
       <div className="flex items-center gap-3 my-4">
-        <Avatar
-          size={44}
-          className="bg-blue-600 text-white font-bold shrink-0"
-        >
+        <Avatar size={44} className="bg-blue-600 text-white font-bold shrink-0">
           {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
         </Avatar>
         <div>
@@ -97,25 +94,15 @@ export const PostModalForm: React.FC<PostModalFormProps> = ({
         </div>
       </div>
 
-      {error && (
-        <Alert
-          message={error}
-          type="error"
-          showIcon
-          className="mb-4 rounded-xl text-xs"
-        />
-      )}
+      {error && <Alert message={error} type="error" showIcon className="mb-4 rounded-xl text-xs" />}
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        requiredMark={false}
-      >
+      <Form form={form} layout="vertical" onFinish={handleFinish} requiredMark={false}>
         {/* Author selection if multiple authors available */}
         <Form.Item
           name="author_id"
-          label={<span className="text-xs font-semibold text-gray-600">Đăng với tư cách tác giả:</span>}
+          label={
+            <span className="text-xs font-semibold text-gray-600">Đăng với tư cách tác giả:</span>
+          }
           rules={[{ required: true, message: 'Vui lòng chọn tác giả' }]}
           className="mb-3"
         >

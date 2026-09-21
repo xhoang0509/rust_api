@@ -2,18 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Pagination } from 'antd';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import {
-  getAuthors,
-  createAuthor,
-  updateAuthor,
-  deleteAuthor,
-} from '../api/authors';
-import {
-  getPosts,
-  createPost,
-  updatePost,
-  deletePost,
-} from '../api/posts';
+import { getAuthors, createAuthor, updateAuthor, deleteAuthor } from '../api/authors';
+import { getPosts, createPost, updatePost, deletePost } from '../api/posts';
 import type {
   Author,
   CreateAuthor,
@@ -102,7 +92,7 @@ export const DashboardView: React.FC = () => {
       if (activeTab === 'my-posts' && currentUser) {
         // Find author ID for current logged in user
         const matchedAuthor = authors.find(
-          (a) => a.email.toLowerCase() === currentUser.email.toLowerCase()
+          (a) => a.email.toLowerCase() === currentUser.email.toLowerCase(),
         );
         if (matchedAuthor) {
           filterId = matchedAuthor.id;
@@ -151,9 +141,7 @@ export const DashboardView: React.FC = () => {
     try {
       if (editingAuthor) {
         const updated = await updateAuthor(editingAuthor.id, data);
-        setAuthors((prev) =>
-          prev.map((a) => (a.id === updated.id ? updated : a))
-        );
+        setAuthors((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
         setEditingAuthor(null);
         showToast(`Đã cập nhật tác giả "${updated.name}"`, 'success');
       } else {
@@ -309,10 +297,7 @@ export const DashboardView: React.FC = () => {
           ) : (
             <>
               {/* Create Post Card */}
-              <CreatePostCard
-                currentUser={currentUser}
-                onOpenModal={handleOpenCreatePost}
-              />
+              <CreatePostCard currentUser={currentUser} onOpenModal={handleOpenCreatePost} />
 
               {/* Feed Filter & Search */}
               <FeedFilterBar

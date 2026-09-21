@@ -61,14 +61,7 @@ export const AuthorModalForm: React.FC<AuthorModalFormProps> = ({
       width={460}
       className="rounded-2xl overflow-hidden"
     >
-      {error && (
-        <Alert
-          message={error}
-          type="error"
-          showIcon
-          className="my-3 rounded-xl text-xs"
-        />
-      )}
+      {error && <Alert message={error} type="error" showIcon className="my-3 rounded-xl text-xs" />}
 
       <Form
         form={form}

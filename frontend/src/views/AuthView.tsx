@@ -92,12 +92,7 @@ export const AuthView: React.FC = () => {
             </p>
           </div>
 
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleFinish}
-            requiredMark={false}
-          >
+          <Form form={form} layout="vertical" onFinish={handleFinish} requiredMark={false}>
             {activeTab === 'register' && (
               <Form.Item
                 name="name"

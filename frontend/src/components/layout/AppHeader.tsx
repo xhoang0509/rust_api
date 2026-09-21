@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Layout,
-  Input,
-  Avatar,
-  Dropdown,
-  Badge,
-  Button,
-  Tooltip,
-  Tag,
-} from 'antd';
+import { Layout, Input, Avatar, Dropdown, Badge, Button, Tooltip, Tag } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   SearchOutlined,
@@ -188,8 +179,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             apiStatus === 'online'
               ? 'Hoạt động bình thường'
               : apiStatus === 'offline'
-              ? 'Mất kết nối máy chủ'
-              : 'Đang kiểm tra'
+                ? 'Mất kết nối máy chủ'
+                : 'Đang kiểm tra'
           }`}
         >
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-600">

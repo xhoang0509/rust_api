@@ -11,9 +11,10 @@ interface CommentItemProps {
 }
 
 function parseUtcDate(dateString: string): Date {
-  const normalizedDateStr = dateString.includes('Z') || dateString.includes('T')
-    ? dateString
-    : dateString.replace(' ', 'T') + 'Z';
+  const normalizedDateStr =
+    dateString.includes('Z') || dateString.includes('T')
+      ? dateString
+      : dateString.replace(' ', 'T') + 'Z';
   return new Date(normalizedDateStr);
 }
 
@@ -102,10 +103,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className={`flex gap-2.5 group text-sm ${isDeleting ? 'opacity-50' : ''}`}>
       {/* Avatar */}
-      <Avatar
-        size={32}
-        className="bg-gray-200 text-gray-700 font-bold shrink-0 mt-0.5"
-      >
+      <Avatar size={32} className="bg-gray-200 text-gray-700 font-bold shrink-0 mt-0.5">
         {comment.author_name ? comment.author_name.charAt(0).toUpperCase() : '?'}
       </Avatar>
 
@@ -153,7 +151,10 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                   {comment.author_name}
                 </span>
                 {comment.author_id === postAuthorId && (
-                  <Tag color="blue" className="text-[10px] m-0 px-1 py-0 border-0 rounded font-medium">
+                  <Tag
+                    color="blue"
+                    className="text-[10px] m-0 px-1 py-0 border-0 rounded font-medium"
+                  >
                     Tác giả bài viết
                   </Tag>
                 )}

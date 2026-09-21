@@ -54,10 +54,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
     <div className="space-y-1">
       <div className="flex gap-2.5 items-start">
         {/* User avatar */}
-        <Avatar
-          size={36}
-          className="bg-blue-600 text-white font-bold shrink-0 mt-0.5 shadow-2xs"
-        >
+        <Avatar size={36} className="bg-blue-600 text-white font-bold shrink-0 mt-0.5 shadow-2xs">
           {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
         </Avatar>
 

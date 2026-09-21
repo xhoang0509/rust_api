@@ -1,10 +1,6 @@
 import React from 'react';
 import { Card, Input, Select, Button, Tag } from 'antd';
-import {
-  SearchOutlined,
-  CloseCircleOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined, CloseCircleOutlined, UserOutlined } from '@ant-design/icons';
 import type { Author } from '../../types';
 
 interface FeedFilterBarProps {

@@ -6,7 +6,9 @@ pub async fn init_pool(database_url: &str) -> Result<SqlitePool, Error> {
         .max_connections(5)
         .after_connect(|conn, _meta| {
             Box::pin(async move {
-                sqlx::query("PRAGMA foreign_keys = ON;").execute(conn).await?;
+                sqlx::query("PRAGMA foreign_keys = ON;")
+                    .execute(conn)
+                    .await?;
                 Ok(())
             })
         })

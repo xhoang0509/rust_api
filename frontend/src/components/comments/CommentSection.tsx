@@ -62,7 +62,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         setIsLoadingMore(false);
       }
     },
-    [postId]
+    [postId],
   );
 
   useEffect(() => {
@@ -93,9 +93,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const handleUpdateComment = async (commentId: number, content: string) => {
     try {
       const updated = await updateComment(commentId, content);
-      setComments((prev) =>
-        prev.map((c) => (c.id === commentId ? updated : c))
-      );
+      setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)));
       showToast('Đã cập nhật bình luận', 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Cập nhật bình luận thất bại';

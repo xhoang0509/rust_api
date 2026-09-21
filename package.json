@@ -1,0 +1,17 @@
+{
+  "name": "rust_api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A full-stack web application featuring an asynchronous REST API built with [Axum](https://github.com/tokio-rs/axum), SQLite persistence via [SQLx](https://github.com/launchbadge/sqlx), Argon2 password hashing with JWT authentication, and an interactive frontend built with React 19, TypeScript, and Tailwind CSS (bundled directly into the compiled binary with `rust-embed`).",
+  "scripts": {
+    "format": "cargo fmt && prettier --write \"frontend/src/**/*.{ts,tsx,css,json}\"",
+    "format:check": "cargo fmt --check && prettier --check \"frontend/src/**/*.{ts,tsx,css,json}\"",
+    "lint": "cargo clippy --all-targets -- -D warnings",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.8"
+  }
+}

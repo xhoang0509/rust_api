@@ -39,7 +39,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         timersRef.current.set(id, timer);
       }
     },
-    [removeToast]
+    [removeToast],
   );
 
   useEffect(() => {

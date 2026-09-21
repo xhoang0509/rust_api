@@ -1,10 +1,6 @@
 import React from 'react';
 import { Card, Avatar, Button, Divider } from 'antd';
-import {
-  FormOutlined,
-  SmileOutlined,
-  PictureOutlined,
-} from '@ant-design/icons';
+import { FormOutlined, SmileOutlined, PictureOutlined } from '@ant-design/icons';
 import type { CurrentUser } from '../../types';
 
 interface CreatePostCardProps {
@@ -12,20 +8,14 @@ interface CreatePostCardProps {
   onOpenModal: () => void;
 }
 
-export const CreatePostCard: React.FC<CreatePostCardProps> = ({
-  currentUser,
-  onOpenModal,
-}) => {
+export const CreatePostCard: React.FC<CreatePostCardProps> = ({ currentUser, onOpenModal }) => {
   return (
     <Card
       className="rounded-2xl border-0 shadow-xs bg-white mb-4 transition-all hover:shadow-sm"
       bodyStyle={{ padding: '16px' }}
     >
       <div className="flex items-center gap-3">
-        <Avatar
-          size={42}
-          className="bg-blue-600 text-white font-bold shrink-0"
-        >
+        <Avatar size={42} className="bg-blue-600 text-white font-bold shrink-0">
           {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
         </Avatar>
 

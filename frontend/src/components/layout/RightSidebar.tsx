@@ -52,9 +52,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
 
         {selectedAuthorId !== undefined && (
           <div className="mb-3 flex items-center justify-between p-2 rounded-xl bg-blue-50 border border-blue-200 text-xs">
-            <span className="text-blue-700 font-medium truncate">
-              Đang lọc theo tác giả
-            </span>
+            <span className="text-blue-700 font-medium truncate">Đang lọc theo tác giả</span>
             <button
               type="button"
               onClick={() => onSelectAuthor(undefined)}
@@ -96,9 +94,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
                       {author.name.charAt(0).toUpperCase()}
                     </Avatar>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold truncate leading-tight">
-                        {author.name}
-                      </p>
+                      <p className="text-xs font-semibold truncate leading-tight">{author.name}</p>
                       <p className="text-[10px] text-gray-400 truncate leading-none mt-0.5">
                         {author.email}
                       </p>

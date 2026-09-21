@@ -1,0 +1,10 @@
+node_modules
+target
+dist
+Cargo.lock
+package-lock.json
+frontend/package-lock.json
+frontend/dist
+.husky
+.claude
+docs

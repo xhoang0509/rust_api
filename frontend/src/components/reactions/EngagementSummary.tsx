@@ -25,8 +25,7 @@ export const EngagementSummary: React.FC<EngagementSummaryProps> = ({
   // Determine top reaction emojis to show
   let topEmojis: string[] = [];
   if (breakdown) {
-    topEmojis = REACTION_ORDER
-      .filter((type) => breakdown[type] > 0)
+    topEmojis = REACTION_ORDER.filter((type) => breakdown[type] > 0)
       .sort((a, b) => breakdown[b] - breakdown[a])
       .slice(0, 3)
       .map((type) => REACTION_CONFIG[type].emoji);

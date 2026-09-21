@@ -7,7 +7,7 @@ export async function getPostReactions(postId: number): Promise<PostReactionsRes
 
 export async function setPostReaction(
   postId: number,
-  reactionType: ReactionType
+  reactionType: ReactionType,
 ): Promise<ReactionSummary> {
   return request<ReactionSummary>(`/api/posts/${postId}/reactions`, {
     method: 'PUT',

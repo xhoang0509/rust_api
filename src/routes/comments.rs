@@ -96,7 +96,10 @@ pub async fn create_comment(
 ) -> Result<(StatusCode, Json<Comment>), (StatusCode, String)> {
     let trimmed = payload.content.trim();
     if trimmed.is_empty() {
-        return Err((StatusCode::BAD_REQUEST, "Content cannot be empty".to_string()));
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Content cannot be empty".to_string(),
+        ));
     }
     if trimmed.chars().count() > MAX_COMMENT_LENGTH {
         return Err((
@@ -122,21 +125,20 @@ pub async fn create_comment(
         return Err((StatusCode::NOT_FOUND, "Post not found".to_string()));
     }
 
-    let result = sqlx::query(
-        "INSERT INTO post_comments (post_id, author_id, content) VALUES (?, ?, ?)",
-    )
-    .bind(id)
-    .bind(auth_user.id)
-    .bind(trimmed)
-    .execute(&state.pool)
-    .await
-    .map_err(|e| {
-        tracing::error!("Failed to insert comment: {:?}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Database error".to_string(),
-        )
-    })?;
+    let result =
+        sqlx::query("INSERT INTO post_comments (post_id, author_id, content) VALUES (?, ?, ?)")
+            .bind(id)
+            .bind(auth_user.id)
+            .bind(trimmed)
+            .execute(&state.pool)
+            .await
+            .map_err(|e| {
+                tracing::error!("Failed to insert comment: {:?}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Database error".to_string(),
+                )
+            })?;
 
     let comment_id = result.last_insert_rowid();
 
@@ -178,7 +180,10 @@ pub async fn update_comment(
 ) -> Result<Json<Comment>, (StatusCode, String)> {
     let trimmed = payload.content.trim();
     if trimmed.is_empty() {
-        return Err((StatusCode::BAD_REQUEST, "Content cannot be empty".to_string()));
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Content cannot be empty".to_string(),
+        ));
     }
     if trimmed.chars().count() > MAX_COMMENT_LENGTH {
         return Err((

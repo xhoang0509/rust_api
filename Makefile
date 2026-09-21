@@ -1,8 +1,17 @@
-.PHONY: help dev dev-backend dev-frontend build test clean docker-up docker-down docker-logs bump-patch bump-minor bump-major
+.PHONY: help dev dev-backend dev-frontend build test format lint clean docker-up docker-down docker-logs bump-patch bump-minor bump-major
 
 help: ## Display documented targets
 	@echo "Available targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+format: ## Format code (Rust & Frontend)
+	cargo fmt
+	npx prettier --write "frontend/src/**/*.{ts,tsx,css,json}"
+
+lint: ## Run format and lint checks (clippy & frontend typecheck)
+	cargo fmt --check
+	cargo clippy --all-targets -- -D warnings
+	cd frontend && npm run build
 
 dev: ## Run backend and frontend concurrently
 	npx --yes concurrently -k -p "[{name}]" -n "backend,frontend" -c "cyan,magenta" "cargo run" "cd frontend && npm run dev"

@@ -105,7 +105,9 @@ async fn test_reactions_lifecycle_and_toggle() {
                 .method("PUT")
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -121,7 +123,9 @@ async fn test_reactions_lifecycle_and_toggle() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "dislike" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "dislike" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -137,7 +141,9 @@ async fn test_reactions_lifecycle_and_toggle() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -158,7 +164,9 @@ async fn test_reactions_lifecycle_and_toggle() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction": "love" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction": "love" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -199,7 +207,9 @@ async fn test_reactions_lifecycle_and_toggle() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "haha" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "haha" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -222,7 +232,9 @@ async fn test_reactions_lifecycle_and_toggle() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "haha" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "haha" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -275,7 +287,8 @@ async fn test_comments_crud_permissions_and_pagination() {
     let app = create_app(pool);
 
     let (author_a_id, token_a) = register_user(&app, "Post Owner", "owner@example.com").await;
-    let (author_b_id, token_b) = register_user(&app, "Commenter B", "commenter_b@example.com").await;
+    let (author_b_id, token_b) =
+        register_user(&app, "Commenter B", "commenter_b@example.com").await;
     let (_author_c_id, token_c) = register_user(&app, "Third Party C", "third_c@example.com").await;
 
     let post_id = create_post_helper(&app, &token_a, "Owner Post", "Owner Content").await;
@@ -289,7 +302,9 @@ async fn test_comments_crud_permissions_and_pagination() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Great post by owner!" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Great post by owner!" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -312,7 +327,9 @@ async fn test_comments_crud_permissions_and_pagination() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "   " })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "   " })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -328,7 +345,9 @@ async fn test_comments_crud_permissions_and_pagination() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Thanks for reading!" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Thanks for reading!" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -368,7 +387,9 @@ async fn test_comments_crud_permissions_and_pagination() {
                 .uri(format!("/api/comments/{}", comment_b.id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_c))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Hacked content" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Hacked content" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -384,7 +405,9 @@ async fn test_comments_crud_permissions_and_pagination() {
                 .uri(format!("/api/comments/{}", comment_b.id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Owner edited content" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Owner edited content" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -400,7 +423,9 @@ async fn test_comments_crud_permissions_and_pagination() {
                 .uri(format!("/api/comments/{}", comment_b.id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Updated comment by B" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Updated comment by B" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -493,7 +518,9 @@ async fn test_post_detail_and_list_with_reaction_and_comment_counts() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_a))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "love" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "love" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -509,7 +536,9 @@ async fn test_post_detail_and_list_with_reaction_and_comment_counts() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "haha" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "haha" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -525,7 +554,9 @@ async fn test_post_detail_and_list_with_reaction_and_comment_counts() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Comment 1" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Comment 1" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -639,8 +670,10 @@ async fn test_all_six_reaction_types() {
     let pool = init_pool("sqlite::memory:").await.unwrap();
     let app = create_app(pool);
 
-    let (_post_author_id, post_token) = register_user(&app, "Post Author", "author@example.com").await;
-    let post_id = create_post_helper(&app, &post_token, "Reactions Test Post", "Post Content").await;
+    let (_post_author_id, post_token) =
+        register_user(&app, "Post Author", "author@example.com").await;
+    let post_id =
+        create_post_helper(&app, &post_token, "Reactions Test Post", "Post Content").await;
 
     let reaction_types = ["like", "love", "haha", "wow", "sad", "angry"];
     let mut tokens = Vec::new();
@@ -732,7 +765,9 @@ async fn test_unauthenticated_requests_fail() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Initial Comment" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Initial Comment" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -749,7 +784,9 @@ async fn test_unauthenticated_requests_fail() {
                 .method("PUT")
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -778,7 +815,9 @@ async fn test_unauthenticated_requests_fail() {
                 .method("POST")
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Anon Comment" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Anon Comment" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -793,7 +832,9 @@ async fn test_unauthenticated_requests_fail() {
                 .method("PUT")
                 .uri(format!("/api/comments/{}", comment.id))
                 .header("content-type", "application/json")
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Anon Update" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Anon Update" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -832,7 +873,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -848,7 +891,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "  \n\t  " })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "  \n\t  " })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -865,7 +910,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": too_long_content })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": too_long_content })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -881,7 +928,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Initial text" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Initial text" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -899,7 +948,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/comments/{}", comment.id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -915,7 +966,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/comments/{}", comment.id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "   " })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "   " })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -931,7 +984,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri(format!("/api/comments/{}", comment.id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": too_long_content })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": too_long_content })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -947,7 +1002,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri("/api/comments/99999")
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "New text" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "New text" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -978,7 +1035,9 @@ async fn test_validation_and_not_found_edge_cases() {
                 .uri("/api/posts/99999/comments")
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Comment on ghost" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Comment on ghost" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -1019,7 +1078,8 @@ async fn test_database_cascade_deletion() {
     let pool = init_pool("sqlite::memory:").await.unwrap();
     let app = create_app(pool.clone());
 
-    let (_post_author_id, post_token) = register_user(&app, "Post Cascade Author", "post_cas@example.com").await;
+    let (_post_author_id, post_token) =
+        register_user(&app, "Post Cascade Author", "post_cas@example.com").await;
     let (_user_b_id, token_b) = register_user(&app, "User B Cas", "user_b_cas@example.com").await;
 
     let post_id = create_post_helper(&app, &post_token, "Cascade Post", "Cascade Content").await;
@@ -1033,7 +1093,9 @@ async fn test_database_cascade_deletion() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", post_token))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "like" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -1049,7 +1111,9 @@ async fn test_database_cascade_deletion() {
                 .uri(format!("/api/posts/{}/reactions", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "reaction_type": "love" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "reaction_type": "love" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -1065,7 +1129,9 @@ async fn test_database_cascade_deletion() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", post_token))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Comment 1" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Comment 1" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -1081,7 +1147,9 @@ async fn test_database_cascade_deletion() {
                 .uri(format!("/api/posts/{}/comments", post_id))
                 .header("content-type", "application/json")
                 .header("authorization", format!("Bearer {}", token_b))
-                .body(Body::from(serde_json::to_vec(&json!({ "content": "Comment 2" })).unwrap()))
+                .body(Body::from(
+                    serde_json::to_vec(&json!({ "content": "Comment 2" })).unwrap(),
+                ))
                 .unwrap(),
         )
         .await
@@ -1089,18 +1157,20 @@ async fn test_database_cascade_deletion() {
     assert_eq!(res.status(), StatusCode::CREATED);
 
     // Verify row counts in the SQLite database directly
-    let reaction_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM post_reactions WHERE post_id = ?")
-        .bind(post_id)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+    let reaction_count: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM post_reactions WHERE post_id = ?")
+            .bind(post_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     assert_eq!(reaction_count.0, 2);
 
-    let comment_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM post_comments WHERE post_id = ?")
-        .bind(post_id)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+    let comment_count: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM post_comments WHERE post_id = ?")
+            .bind(post_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     assert_eq!(comment_count.0, 2);
 
     // Delete the post via API
@@ -1119,18 +1189,19 @@ async fn test_database_cascade_deletion() {
     assert_eq!(res.status(), StatusCode::NO_CONTENT);
 
     // Verify that reactions and comments are completely deleted in the SQLite database
-    let reaction_count_after: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM post_reactions WHERE post_id = ?")
-        .bind(post_id)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+    let reaction_count_after: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM post_reactions WHERE post_id = ?")
+            .bind(post_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     assert_eq!(reaction_count_after.0, 0);
 
-    let comment_count_after: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM post_comments WHERE post_id = ?")
-        .bind(post_id)
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+    let comment_count_after: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM post_comments WHERE post_id = ?")
+            .bind(post_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     assert_eq!(comment_count_after.0, 0);
 }
-
