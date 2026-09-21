@@ -1,4 +1,4 @@
-.PHONY: help dev dev-backend dev-frontend build test clean docker-up docker-down docker-logs
+.PHONY: help dev dev-backend dev-frontend build test clean docker-up docker-down docker-logs bump-patch bump-minor bump-major
 
 help: ## Display documented targets
 	@echo "Available targets:"
@@ -33,3 +33,13 @@ docker-down: ## Stop and remove Docker containers
 
 docker-logs: ## View live Docker container logs
 	docker compose logs -f
+
+bump-patch: ## Bump patch version (e.g. 0.1.0 -> 0.1.1) and update changelog
+	./scripts/bump-version.sh patch
+
+bump-minor: ## Bump minor version (e.g. 0.1.0 -> 0.2.0) and update changelog
+	./scripts/bump-version.sh minor
+
+bump-major: ## Bump major version (e.g. 0.2.0 -> 1.0.0) and update changelog
+	./scripts/bump-version.sh major
+
