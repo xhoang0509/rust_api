@@ -12,7 +12,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tower-http = { version = "0.7", features = ["trace", "cors"] }
 sqlx = { version = "0.9", features = ["runtime-tokio", "sqlite", "migrate"] }
-argon2 = "0.5"
+argon2 = "0.6"
 jsonwebtoken = { version = "11", features = ["rust_crypto"] }
 rand = "0.8"
 rust-embed = "8"
