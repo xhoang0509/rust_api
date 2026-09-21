@@ -24,7 +24,17 @@ impl FromRequestParts<AppState> for AuthUser {
             .and_then(|val| val.to_str().ok());
 
         let token = match auth_header {
-            Some(header_val) if header_val.starts_with("Bearer ") => &header_val[7..],
+            Some(header_val)
+                if header_val
+                    .get(..7)
+                    .is_some_and(|prefix| prefix.eq_ignore_ascii_case("bearer ")) =>
+            {
+                let trimmed = header_val[7..].trim();
+                if trimmed.is_empty() {
+                    return Err((StatusCode::UNAUTHORIZED, "Unauthorized".to_string()));
+                }
+                trimmed
+            }
             _ => return Err((StatusCode::UNAUTHORIZED, "Unauthorized".to_string())),
         };
 

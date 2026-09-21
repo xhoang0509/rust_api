@@ -10,7 +10,6 @@ interface PostFormProps {
   onCancel?: () => void;
   isLoading?: boolean;
   error?: string | null;
-  onOpenAuth?: () => void;
 }
 
 export const PostForm: FC<PostFormProps> = ({
@@ -19,9 +18,8 @@ export const PostForm: FC<PostFormProps> = ({
   onCancel,
   isLoading = false,
   error = null,
-  onOpenAuth,
 }) => {
-  const { isAuthenticated, currentUser } = useAuth();
+  const { currentUser } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -40,11 +38,6 @@ export const PostForm: FC<PostFormProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setValidationError(null);
-
-    if (!isAuthenticated) {
-      setValidationError('You must be signed in to create or edit posts.');
-      return;
-    }
 
     const trimmedTitle = title.trim();
     const trimmedContent = content.trim();
@@ -99,24 +92,6 @@ export const PostForm: FC<PostFormProps> = ({
         )}
       </div>
 
-      {!isAuthenticated && (
-        <div className="mb-4 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg flex items-center justify-between">
-          <div>
-            <p className="font-semibold">Sign in required</p>
-            <p className="text-xs text-amber-700 mt-0.5">Please sign in to create or edit posts.</p>
-          </div>
-          {onOpenAuth && (
-            <button
-              type="button"
-              onClick={onOpenAuth}
-              className="ml-3 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-xs cursor-pointer"
-            >
-              Sign In
-            </button>
-          )}
-        </div>
-      )}
-
       {(validationError || error) && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
           {validationError || error}
@@ -133,7 +108,7 @@ export const PostForm: FC<PostFormProps> = ({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            disabled={isLoading || !isAuthenticated}
+            disabled={isLoading}
             placeholder="Post title"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 text-gray-900"
           />
@@ -148,7 +123,7 @@ export const PostForm: FC<PostFormProps> = ({
             rows={4}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            disabled={isLoading || !isAuthenticated}
+            disabled={isLoading}
             placeholder="Write the post content here..."
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 text-gray-900 resize-y"
           />
@@ -157,7 +132,7 @@ export const PostForm: FC<PostFormProps> = ({
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            disabled={isLoading || !isAuthenticated}
+            disabled={isLoading}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-xs transition duration-150 ease-in-out cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading && (
@@ -166,11 +141,7 @@ export const PostForm: FC<PostFormProps> = ({
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
               </svg>
             )}
-            {!isAuthenticated
-              ? 'Sign in to post'
-              : isEditing
-              ? 'Update Post'
-              : 'Create Post'}
+            {isEditing ? 'Update Post' : 'Create Post'}
           </button>
           {isEditing && onCancel && (
             <button

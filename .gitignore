@@ -4,4 +4,6 @@ Cargo.lock
 *.swp
 *.db
 *.db-*
+.agents/
+skills-lock.json
 

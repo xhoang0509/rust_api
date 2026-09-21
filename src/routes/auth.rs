@@ -8,6 +8,21 @@ pub async fn register(
     State(state): State<AppState>,
     Json(payload): Json<RegisterRequest>,
 ) -> Result<(StatusCode, Json<AuthResponse>), (StatusCode, String)> {
+    let name = payload.name.trim();
+    if name.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "Name cannot be empty".to_string()));
+    }
+    let email = payload.email.trim().to_lowercase();
+    if email.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "Email cannot be empty".to_string()));
+    }
+    if payload.password.len() < 6 {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Password must be at least 6 characters".to_string(),
+        ));
+    }
+
     let password_hash = hash_password(&payload.password).map_err(|e| {
         tracing::error!("Failed to hash password: {:?}", e);
         (
@@ -17,8 +32,8 @@ pub async fn register(
     })?;
 
     let result = sqlx::query("INSERT INTO authors (name, email, password_hash) VALUES (?, ?, ?)")
-        .bind(&payload.name)
-        .bind(&payload.email)
+        .bind(name)
+        .bind(&email)
         .bind(&password_hash)
         .execute(&state.pool)
         .await;
@@ -51,9 +66,10 @@ pub async fn register(
 
             Ok((StatusCode::CREATED, Json(AuthResponse { token, author })))
         }
-        Err(sqlx::Error::Database(db_err)) if db_err.is_unique_violation() => {
-            Err((StatusCode::BAD_REQUEST, "Email already exists".to_string()))
-        }
+        Err(sqlx::Error::Database(db_err)) if db_err.is_unique_violation() => Err((
+            StatusCode::BAD_REQUEST,
+            "Email is already registered".to_string(),
+        )),
         Err(e) => {
             tracing::error!("Failed to insert author: {:?}", e);
             Err((
@@ -68,10 +84,18 @@ pub async fn login(
     State(state): State<AppState>,
     Json(payload): Json<LoginRequest>,
 ) -> Result<(StatusCode, Json<AuthResponse>), (StatusCode, String)> {
+    let email = payload.email.trim().to_lowercase();
+    if email.is_empty() || payload.password.is_empty() {
+        return Err((
+            StatusCode::UNAUTHORIZED,
+            "Email and password are required".to_string(),
+        ));
+    }
+
     let record: Option<(i64, String, String, String, String)> = sqlx::query_as(
         "SELECT id, name, email, password_hash, created_at FROM authors WHERE email = ?",
     )
-    .bind(&payload.email)
+    .bind(&email)
     .fetch_optional(&state.pool)
     .await
     .map_err(|e| {
@@ -84,16 +108,21 @@ pub async fn login(
 
     let (id, name, email, password_hash, created_at) = match record {
         Some(row) => row,
-        None => return Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string())),
+        None => {
+            return Err((
+                StatusCode::UNAUTHORIZED,
+                "Account does not exist".to_string(),
+            ))
+        }
     };
 
     let is_valid = verify_password(&payload.password, &password_hash).map_err(|e| {
         tracing::error!("Password verification error: {:?}", e);
-        (StatusCode::UNAUTHORIZED, "Invalid credentials".to_string())
+        (StatusCode::UNAUTHORIZED, "Incorrect password".to_string())
     })?;
 
     if !is_valid {
-        return Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()));
+        return Err((StatusCode::UNAUTHORIZED, "Incorrect password".to_string()));
     }
 
     let token = generate_token(id, &email, &state.jwt_secret).map_err(|e| {
