@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Avatar, Input, Button } from 'antd';
+import { SendOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 
 interface CommentInputProps {
@@ -9,7 +11,7 @@ interface CommentInputProps {
 
 export const CommentInput: React.FC<CommentInputProps> = ({
   onSubmit,
-  placeholder = 'Write a comment...',
+  placeholder = 'Viết bình luận...',
   autoFocus = false,
 }) => {
   const { currentUser, isAuthenticated } = useAuth();
@@ -20,13 +22,12 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   if (!isAuthenticated || !currentUser) {
     return (
       <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-center text-xs text-gray-500">
-        Please log in to leave a comment.
+        Vui lòng đăng nhập để tham gia bình luận.
       </div>
     );
   }
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSubmit = async () => {
     const trimmed = content.trim();
     if (!trimmed || isSubmitting) return;
 
@@ -36,7 +37,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
       await onSubmit(trimmed);
       setContent('');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to post comment');
+      setError(err instanceof Error ? err.message : 'Gửi bình luận thất bại');
     } finally {
       setIsSubmitting(false);
     }
@@ -51,17 +52,18 @@ export const CommentInput: React.FC<CommentInputProps> = ({
 
   return (
     <div className="space-y-1">
-      <form onSubmit={handleSubmit} className="flex gap-2.5 items-start">
+      <div className="flex gap-2.5 items-start">
         {/* User avatar */}
-        <div className="shrink-0 mt-0.5">
-          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shadow-2xs">
-            {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
-          </div>
-        </div>
+        <Avatar
+          size={36}
+          className="bg-blue-600 text-white font-bold shrink-0 mt-0.5 shadow-2xs"
+        >
+          {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+        </Avatar>
 
         {/* Input area */}
         <div className="flex-1 relative">
-          <textarea
+          <Input.TextArea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -69,21 +71,23 @@ export const CommentInput: React.FC<CommentInputProps> = ({
             placeholder={placeholder}
             autoFocus={autoFocus}
             maxLength={5000}
-            rows={1}
-            className="w-full text-xs sm:text-sm px-3.5 py-2 pr-16 bg-gray-50 hover:bg-gray-100/80 focus:bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-2xl outline-hidden resize-none transition-all"
-            style={{ minHeight: '38px', maxHeight: '120px' }}
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            className="rounded-2xl py-2 px-3.5 pr-12 bg-gray-100 hover:bg-gray-200/70 focus:bg-white text-xs sm:text-sm border-transparent focus:border-blue-500"
           />
-          <div className="absolute right-1.5 bottom-1.5 flex items-center">
-            <button
-              type="submit"
+          <div className="absolute right-2 bottom-1.5 flex items-center">
+            <Button
+              type="text"
+              shape="circle"
+              size="small"
+              icon={<SendOutlined />}
+              onClick={handleSubmit}
+              loading={isSubmitting}
               disabled={isSubmitting || !content.trim()}
-              className="px-2.5 py-1 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-xl cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSubmitting ? '...' : 'Post'}
-            </button>
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            />
           </div>
         </div>
-      </form>
+      </div>
       {error && <p className="text-xs text-red-500 pl-11">{error}</p>}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Spin, Button, Alert } from 'antd';
 import type { Comment } from '../../types';
 import { getComments, createComment, updateComment, deleteComment } from '../../api/comments';
 import { CommentInput } from './CommentInput';
@@ -54,7 +55,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         setTotalPages(response.total_pages);
         setHasLoaded(true);
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'Failed to load comments';
+        const msg = err instanceof Error ? err.message : 'Tải bình luận thất bại';
         setError(msg);
       } finally {
         setIsLoading(false);
@@ -81,9 +82,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         onCommentCountChangeRef.current(next);
         return next;
       });
-      showToast('Comment posted', 'success');
+      showToast('Đã đăng bình luận', 'success');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to post comment';
+      const msg = err instanceof Error ? err.message : 'Gửi bình luận thất bại';
       showToast(msg, 'error');
       throw err;
     }
@@ -95,9 +96,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       setComments((prev) =>
         prev.map((c) => (c.id === commentId ? updated : c))
       );
-      showToast('Comment updated', 'success');
+      showToast('Đã cập nhật bình luận', 'success');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to update comment';
+      const msg = err instanceof Error ? err.message : 'Cập nhật bình luận thất bại';
       showToast(msg, 'error');
       throw err;
     }
@@ -112,9 +113,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         onCommentCountChangeRef.current(next);
         return next;
       });
-      showToast('Comment deleted', 'info');
+      showToast('Đã xóa bình luận', 'info');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to delete comment';
+      const msg = err instanceof Error ? err.message : 'Xóa bình luận thất bại';
       showToast(msg, 'error');
       throw err;
     }
@@ -128,38 +129,39 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
   return (
     <div
-      className="pt-3 mt-3 border-t border-gray-100 space-y-4"
-      aria-label={`Comments section (${totalComments})`}
+      className="pt-3 mt-3 border-t border-gray-100 space-y-3.5"
+      aria-label={`Khu vực bình luận (${totalComments})`}
     >
       {/* Input box */}
       <CommentInput onSubmit={handleCreateComment} />
 
       {/* Loading state */}
       {isLoading && (
-        <div className="py-4 text-center text-xs text-gray-500">
-          <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent mr-2 align-middle"></div>
-          Loading comments...
+        <div className="py-6 text-center">
+          <Spin size="small" />
+          <span className="text-xs text-gray-500 ml-2">Đang tải bình luận...</span>
         </div>
       )}
 
       {/* Error state */}
       {error && !isLoading && (
-        <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg flex items-center justify-between">
-          <span>{error}</span>
-          <button
-            type="button"
-            onClick={() => loadComments(1, false)}
-            className="font-medium underline hover:no-underline cursor-pointer"
-          >
-            Retry
-          </button>
-        </div>
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          action={
+            <Button size="small" type="link" onClick={() => loadComments(1, false)}>
+              Thử lại
+            </Button>
+          }
+          className="rounded-xl text-xs"
+        />
       )}
 
       {/* Empty state */}
       {!isLoading && !error && comments.length === 0 && (
         <p className="text-center text-xs text-gray-400 py-3 italic">
-          No comments yet. Be the first to share your thoughts!
+          Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ cảm nghĩ!
         </p>
       )}
 
@@ -178,17 +180,16 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
           {/* Load more button */}
           {page < totalPages && (
-            <div className="pt-2 text-center">
-              <button
-                type="button"
+            <div className="pt-1 text-center">
+              <Button
+                type="link"
+                size="small"
                 onClick={handleLoadMore}
-                disabled={isLoadingMore}
-                className="text-xs text-blue-600 hover:text-blue-800 font-medium cursor-pointer disabled:opacity-50"
+                loading={isLoadingMore}
+                className="text-xs text-blue-600 font-semibold"
               >
-                {isLoadingMore
-                  ? 'Loading...'
-                  : `View more comments (${comments.length} of ${totalComments})`}
-              </button>
+                Xem thêm bình luận ({comments.length} trên {totalComments})
+              </Button>
             </div>
           )}
         </div>

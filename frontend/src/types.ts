@@ -5,6 +5,8 @@ export interface Author {
   created_at: string;
 }
 
+export type CurrentUser = Author;
+
 export interface CreateAuthor {
   name: string;
   email: string;

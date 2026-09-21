@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Avatar, Tag, Popconfirm, Button, Input, Tooltip } from 'antd';
 import type { Comment } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 
@@ -22,16 +23,16 @@ function formatRelativeTime(dateString: string): string {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 60) return 'vừa xong';
     const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 60) return `${diffInMinutes} phút`;
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 24) return `${diffInHours} giờ`;
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
+    if (diffInDays < 7) return `${diffInDays} ngày`;
 
-    return date.toLocaleDateString(undefined, {
-      month: 'short',
+    return date.toLocaleDateString('vi-VN', {
+      month: 'numeric',
       day: 'numeric',
     });
   } catch {
@@ -60,7 +61,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   const handleSave = async () => {
     const trimmed = editContent.trim();
     if (!trimmed) {
-      setError('Comment cannot be empty');
+      setError('Bình luận không được để trống');
       return;
     }
 
@@ -75,7 +76,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
       await onUpdate(comment.id, trimmed);
       setIsEditing(false);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to update comment');
+      setError(err instanceof Error ? err.message : 'Cập nhật bình luận thất bại');
     } finally {
       setIsSaving(false);
     }
@@ -87,11 +88,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     setError(null);
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) {
-      return;
-    }
-
+  const handleDeleteConfirm = async () => {
     setIsDeleting(true);
     try {
       await onDelete(comment.id);
@@ -103,90 +100,104 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   const isEdited = comment.updated_at && comment.updated_at !== comment.created_at;
 
   return (
-    <div className={`flex gap-3 group text-sm ${isDeleting ? 'opacity-50' : ''}`}>
+    <div className={`flex gap-2.5 group text-sm ${isDeleting ? 'opacity-50' : ''}`}>
       {/* Avatar */}
-      <div className="shrink-0">
-        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shadow-2xs">
-          {comment.author_name ? comment.author_name.charAt(0).toUpperCase() : '?'}
-        </div>
-      </div>
+      <Avatar
+        size={32}
+        className="bg-gray-200 text-gray-700 font-bold shrink-0 mt-0.5"
+      >
+        {comment.author_name ? comment.author_name.charAt(0).toUpperCase() : '?'}
+      </Avatar>
 
       {/* Main Comment Bubble */}
       <div className="flex-1 min-w-0">
         {isEditing ? (
           <div className="space-y-2">
-            <textarea
+            <Input.TextArea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               disabled={isSaving}
               maxLength={5000}
-              rows={2}
-              className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-hidden resize-none transition-shadow"
-              placeholder="Edit your comment..."
+              autoSize={{ minRows: 2, maxRows: 6 }}
+              className="rounded-xl text-xs sm:text-sm p-2.5 bg-white border border-gray-300 focus:border-blue-500"
+              placeholder="Chỉnh sửa bình luận..."
               autoFocus
             />
             {error && <p className="text-xs text-red-500">{error}</p>}
             <div className="flex gap-2 justify-end">
-              <button
-                type="button"
+              <Button
+                size="small"
                 onClick={handleCancel}
                 disabled={isSaving}
-                className="px-2.5 py-1 text-xs text-gray-600 hover:text-gray-800 rounded-md hover:bg-gray-100 cursor-pointer disabled:opacity-50"
+                className="rounded-lg text-xs"
               >
-                Cancel
-              </button>
-              <button
-                type="button"
+                Hủy
+              </Button>
+              <Button
+                size="small"
+                type="primary"
                 onClick={handleSave}
+                loading={isSaving}
                 disabled={isSaving || !editContent.trim()}
-                className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                className="bg-blue-600 rounded-lg text-xs"
               >
-                {isSaving ? 'Saving...' : 'Save'}
-              </button>
+                Lưu
+              </Button>
             </div>
           </div>
         ) : (
           <div>
-            <div className="inline-block max-w-full bg-gray-100 hover:bg-gray-100/90 transition-colors px-3.5 py-2 rounded-2xl">
-              <div className="flex items-center gap-2">
+            <div className="inline-block max-w-full bg-gray-100 px-3.5 py-2 rounded-2xl">
+              <div className="flex items-center gap-1.5">
                 <span className="font-semibold text-xs text-gray-900 leading-tight">
                   {comment.author_name}
                 </span>
                 {comment.author_id === postAuthorId && (
-                  <span className="px-1.5 py-0.2 bg-blue-50 text-blue-700 border border-blue-200 rounded text-[10px] font-medium">
-                    Author
-                  </span>
+                  <Tag color="blue" className="text-[10px] m-0 px-1 py-0 border-0 rounded font-medium">
+                    Tác giả bài viết
+                  </Tag>
                 )}
               </div>
-              <p className="text-gray-800 text-xs sm:text-sm whitespace-pre-wrap break-words mt-0.5 leading-relaxed">
+              <p className="text-gray-800 text-xs sm:text-sm whitespace-pre-wrap break-words mt-1 leading-relaxed">
                 {comment.content}
               </p>
             </div>
 
             {/* Comment actions & metadata */}
             <div className="flex items-center gap-3 px-2 mt-1 text-[11px] text-gray-500">
-              <span title={parseUtcDate(comment.created_at).toLocaleString()}>
-                {formatRelativeTime(comment.created_at)}
-              </span>
-              {isEdited && <span className="text-gray-400 italic">edited</span>}
+              <Tooltip title={parseUtcDate(comment.created_at).toLocaleString('vi-VN')}>
+                <span className="cursor-pointer hover:underline">
+                  {formatRelativeTime(comment.created_at)}
+                </span>
+              </Tooltip>
+              {isEdited && <span className="text-gray-400 italic">đã chỉnh sửa</span>}
               {canEdit && (
                 <button
                   type="button"
                   onClick={() => setIsEditing(true)}
-                  className="hover:text-blue-600 font-medium cursor-pointer"
+                  className="hover:text-blue-600 font-semibold cursor-pointer"
                 >
-                  Edit
+                  Chỉnh sửa
                 </button>
               )}
               {canDelete && (
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="hover:text-red-600 font-medium cursor-pointer disabled:opacity-50"
+                <Popconfirm
+                  title="Xóa bình luận"
+                  description="Bạn có chắc chắn muốn xóa bình luận này?"
+                  onConfirm={handleDeleteConfirm}
+                  okText="Xóa"
+                  cancelText="Hủy"
+                  okButtonProps={{ danger: true, size: 'small' }}
+                  cancelButtonProps={{ size: 'small' }}
                 >
-                  {isDeleting ? 'Deleting...' : 'Delete'}
-                </button>
+                  <button
+                    type="button"
+                    disabled={isDeleting}
+                    className="hover:text-red-600 font-semibold cursor-pointer disabled:opacity-50"
+                  >
+                    Xóa
+                  </button>
+                </Popconfirm>
               )}
             </div>
           </div>
